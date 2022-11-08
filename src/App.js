@@ -111,6 +111,8 @@ export default function Default() {
     connector: new InjectedConnector(),
   });
   const [windowPositions, setWindowPositions] = React.useState({});
+  const [windowSizes, setWindowSizes] = React.useState({});
+  console.log(windowSizes)
   return (
     <Wrapper>
       <GlobalStyles></GlobalStyles>
@@ -121,9 +123,17 @@ export default function Default() {
               <Rnd
                 key={window + i}
                 onDragStop={(e, data) => {
-                  setWindowPositions({ [window]: data });
+                  setWindowPositions(pos => {
+                    return {  ...pos, [window]: data }
+                  });
                 }}
-                onMouseDown={
+                onResizeStop={(e, data, ref) => {
+                  setWindowSizes(sizes => {
+                    return {  ...sizes, [window]: ref.style }
+                  });
+                  //e.stopImmediatePropagation()
+                }}
+                onClick={
                   () => {
                     setWindowStack({ action: 'focus', window: window });
                     setIexploreWindow(!iexploreWindow);
@@ -131,9 +141,10 @@ export default function Default() {
                 default={{
                   x: (width / 2 - 200) + (i * 40),
                   y: 50 + (i * 40),
-                  width: 400,
+                  width: 1000,
                 }}
                 position={windowPositions[window]}
+                size={windowSizes[window]}
                 minWidth={300}
                 dragHandleClassName="window-header"
                 enableResizing={{
@@ -148,7 +159,7 @@ export default function Default() {
                 }}
                 maxWidth={'100vw'}
               >
-                <Window style={{ width: '100%', height: '100%' }} className="window">
+                <Window  style={{ width: '100%', height: '100%' }} className="window">
 
                   <WindowHeader active={i === windowStack.length - 1} className='window-header'>
                     <span>{window}.exe</span>
@@ -165,7 +176,7 @@ export default function Default() {
                         <span className='close-icon' />
                       </Button>
                     </div>
-                  </WindowHeader>{windows[window]}
+                  </WindowHeader><div style={{overflowY: 'scroll', overflowX: 'hidden', height: 'calc(100% - 2.5em)'}}>{windows[window]}</div>
                 </Window>
               </Rnd>
             );
@@ -205,7 +216,7 @@ export default function Default() {
                     </span>
                     {address ? 'Connected' : 'Connect Wallet'}
                   </ListItem>
-                  <Divider></Divider>
+                  {/* <Divider></Divider>
                   <ListItem disabled={!address} onClick={() => setWindowStack({ action: 'push', window: 'x' })}>
                     <span role='img' aria-label='👨‍🍳' >
                       👨‍🍳
@@ -217,7 +228,7 @@ export default function Default() {
                       🍴
                     </span>
                     Dining Table (Staking)
-                  </ListItem>
+                  </ListItem> */}
                   <Divider />
                   <ListItem disabled={!address} onClick={() => setWindowStack({ action: 'push', window: 'nftselector' })}>
                     <span role='img' aria-label='🤑' >
